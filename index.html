@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imersão 6em7 - Percy Contabilidade 🎯</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Animações */
+        .tab-content { display: none; animation: slideIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+        }
+
+        .turbo-btn { animation: pulse-gold 2s infinite; }
+        
+        textarea { resize: vertical; }
+        .filled-bg { background-color: #f0fdf4; border-color: #86efac; transition: all 0.3s; }
+        .filled-bg:focus { background-color: #fff; transform: scale(1.01); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4 shadow-xl fixed w-full z-50 top-0 border-b-4 border-yellow-400">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform" onclick="dispararConfete()">
+                <div class="bg-yellow-400 p-2 rounded-full text-slate-900 shadow-lg shadow-yellow-500/50">
+                    <i class="fa-solid fa-bullseye text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Percy Contabilidade</h1>
+                    <p class="text-xs text-yellow-300 font-mono font-bold">MODO: IMERSÃO 6EM7 🧠</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="dispararConfete()" class="turbo-btn bg-pink-600 hover:bg-pink-500 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2 transform hover:-translate-y-1 transition-all border-2 border-pink-400">
+                    <i class="fa-solid fa-trophy"></i> VAMOS!
+                </button>
+                <button onclick="saveData()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-save"></i> Salvar
+                </button>
+                <button onclick="exportData()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-download"></i> Baixar TXT
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 mt-20 h-[calc(100vh-80px)] overflow-hidden">
+        
+        <aside class="w-64 bg-white shadow-lg overflow-y-auto hidden md:block border-r border-slate-200 z-40">
+            <nav class="p-4 space-y-2">
+                <div class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest border-b pb-1">Fundamentos</div>
+                <button onclick="openTab('identidade')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group active-nav" data-target="identidade">
+                    <i class="fa-solid fa-id-card text-blue-500 group-hover:scale-110 transition-transform"></i> Identidade
+                </button>
+                <button onclick="openTab('avatar')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="avatar">
+                    <i class="fa-solid fa-users text-purple-500 group-hover:scale-110 transition-transform"></i> Avatar
+                </button>
+                
+                <div class="text-xs font-black text-slate-400 uppercase mt-6 mb-2 tracking-widest border-b pb-1">Estratégia</div>
+                <button onclick="openTab('oferta')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="oferta">
+                    <i class="fa-solid fa-box-open text-green-500 group-hover:scale-110 transition-transform"></i> Oferta Irresistível
+                </button>
+                <button onclick="openTab('entregaveis')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="entregaveis">
+                    <i class="fa-solid fa-list-check text-orange-500 group-hover:scale-110 transition-transform"></i> Entregáveis
+                </button>
+                
+                <div class="text-xs font-black text-slate-400 uppercase mt-6 mb-2 tracking-widest border-b pb-1">Execução</div>
+                <button onclick="openTab('objecoes')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="objecoes">
+                    <i class="fa-solid fa-shield-halved text-red-500 group-hover:scale-110 transition-transform"></i> Objeções
+                </button>
+                <button onclick="openTab('paginas')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="paginas">
+                    <i class="fa-solid fa-desktop text-indigo-500 group-hover:scale-110 transition-transform"></i> Páginas
+                </button>
+                <button onclick="openTab('scripts')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="scripts">
+                    <i class="fa-solid fa-microphone-lines text-pink-500 group-hover:scale-110 transition-transform"></i> Scripts
+                </button>
+                <button onclick="openTab('cronograma')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 focus:bg-yellow-50 focus:text-yellow-800 focus:border-l-4 focus:border-yellow-500 font-medium text-slate-600 transition-all flex items-center gap-3 group" data-target="cronograma">
+                    <i class="fa-solid fa-calendar-days text-teal-500 group-hover:scale-110 transition-transform"></i> Cronograma
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8 bg-slate-50 relative">
+            
+            <div id="identidade" class="tab-content active max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-id-card"></i></span> 
+                    Identidade & Roma
+                </h2>
+                <div class="grid gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Nome do Produto</label>
+                        <input type="text" id="prod_nome" class="w-full p-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none filled-bg text-xl font-bold text-slate-800" value="Método Cheguei, Sou MEI - Blindagem e Crescimento">
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">ROMA (Promessa Transformadora)</label>
+                        <p class="text-xs text-purple-600 font-semibold mb-2 flex items-center gap-1"><i class="fa-solid fa-star"></i> Onde seu cliente quer chegar?</p>
+                        <textarea id="prod_roma" rows="3" class="w-full p-4 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:ring-0 outline-none filled-bg text-lg leading-relaxed">Transformar a guerra burocrática em crescimento seguro, regularizando seu negócio e recuperando impostos pagos a mais, sem você precisar virar contador.</textarea>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Autoridade (Quem é você?)</label>
+                        <textarea id="prod_autoridade" rows="3" class="w-full p-4 border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-0 outline-none filled-bg text-lg text-slate-700">Eu sou Jairo Gandra, Contador e Advogado. Na Percy Contabilidade, unimos inteligência de negócios com segurança jurídica. Não sou apenas um emissor de guias; sou o estrategista que vai impedir que o Leão morda seu lucro.</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="avatar" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-users"></i></span>
+                    Avatar & Nicho
+                </h2>
+                <div class="grid gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">😰 Dores (O Pesadelo)</label>
+                        <textarea id="av_dores" rows="5" class="w-full p-4 border rounded-xl filled-bg text-slate-700 text-lg">- Medo da Malha Fina (cruzamento CPF x CNPJ).
+- Pagar multas por esquecer a declaração anual.
+- Misturar o dinheiro da casa com o do negócio.
+- Medo de perder os benefícios (auxílio doença/aposentadoria) por inadimplência.</textarea>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">🤩 Desejos (O Sonho)</label>
+                        <textarea id="av_desejos" rows="5" class="w-full p-4 border rounded-xl filled-bg text-slate-700 text-lg">- Dormir tranquilo sabendo que está em dia com a Receita.
+- Conseguir comprovar renda para financiamentos.
+- Crescer o negócio e migrar para ME (Microempresa) com segurança.
+- Ter alguém que "cuide do resto" enquanto ele foca no talento dele.</textarea>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <label class="block text-sm font-bold text-slate-500 mb-4 uppercase tracking-wide">🚧 Objeções Universais</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"><input type="checkbox" id="obj_tempo" class="w-5 h-5 accent-blue-600" checked> <span class="font-medium">Não tenho tempo</span></label>
+                            <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"><input type="checkbox" id="obj_dinheiro" class="w-5 h-5 accent-blue-600" checked> <span class="font-medium">Não tenho dinheiro</span></label>
+                            <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"><input type="checkbox" id="obj_confianca" class="w-5 h-5 accent-blue-600" checked> <span class="font-medium">Será que funciona?</span></label>
+                            <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"><input type="checkbox" id="obj_complexo" class="w-5 h-5 accent-blue-600"> <span class="font-medium">É muito complexo</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="oferta" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-box-open"></i></span>
+                    A Oferta Irresistível
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 bg-slate-200 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-bl">ANCORAGEM</div>
+                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Preço Original</label>
+                        <input type="text" id="off_preco_ancora" class="w-full p-3 border-2 border-transparent bg-slate-100 rounded-lg text-slate-400 line-through text-lg" value="R$ 997,00 (Consultoria Tradicional)">
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                             <label class="block text-sm font-bold text-green-600 mb-2 uppercase tracking-wide flex items-center gap-2"><i class="fa-solid fa-tag"></i> Preço da Oferta</label>
+                             <input type="text" id="off_preco_final" class="w-full p-4 border-2 border-green-400 bg-green-50 rounded-xl text-green-800 font-black text-2xl shadow-inner" value="R$ 497,00 (Ou 12x)">
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide"><i class="fa-solid fa-shield-cat"></i> Garantia</label>
+                        <input type="text" id="off_garantia" class="w-full p-4 border rounded-xl filled-bg text-lg" value="7 dias Incondicional + 'Garantia Percy' (Se provar que aplicou e não organizou, eu devolvo o dobro)">
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-yellow-200 bg-gradient-to-br from-white to-yellow-50">
+                    <label class="block text-sm font-bold text-yellow-600 mb-2 uppercase tracking-wide flex items-center gap-2"><i class="fa-solid fa-gift"></i> Bônus (Ouro em pó)</label>
+                    <textarea id="off_bonus" rows="5" class="w-full p-4 border border-yellow-300 rounded-xl bg-white text-slate-700 text-lg shadow-sm">1. Acesso ao Quiz de Diagnóstico Premium.
+2. Planilha de Fluxo de Caixa Automática para MEI.
+3. Aula Extra: "Como migrar de MEI para ME sem quebrar".
+4. Checklist "Blindagem Patrimonial".</textarea>
+                </div>
+            </div>
+
+             <div id="entregaveis" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fa-solid fa-list-check"></i></span>
+                    Os Entregáveis
+                </h2>
+                
+                <div id="entregaveis-container" class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-orange-500 hover:transform hover:translate-x-1 transition-transform">
+                        <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2"><span class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">MÓDULO 1</span> O Diagnóstico (Quiz)</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">O que é?</label>
+                                <input type="text" id="ent_1_oque" class="w-full p-3 border rounded-lg bg-slate-50 font-medium text-slate-700" value="Análise fiscal completa do CPF/CNPJ">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-green-500 uppercase">Benefício</label>
+                                <input type="text" id="ent_1_beneficio" class="w-full p-3 border rounded-lg bg-green-50 font-medium text-green-800" value="Saber o tamanho do problema">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-red-500 uppercase">Dor Resolvida</label>
+                                <input type="text" id="ent_1_dor" class="w-full p-3 border rounded-lg bg-red-50 font-medium text-red-800" value="Medo do desconhecido/Receita">
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-orange-500 hover:transform hover:translate-x-1 transition-transform">
+                        <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2"><span class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">MÓDULO 2</span> A Regularização</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">O que é?</label>
+                                <input type="text" id="ent_2_oque" class="w-full p-3 border rounded-lg bg-slate-50 font-medium text-slate-700" value="Parcelamento e emissão de DAS">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-green-500 uppercase">Benefício</label>
+                                <input type="text" id="ent_2_beneficio" class="w-full p-3 border rounded-lg bg-green-50 font-medium text-green-800" value="Nome limpo e CNPJ ativo">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-red-500 uppercase">Dor Resolvida</label>
+                                <input type="text" id="ent_2_dor" class="w-full p-3 border rounded-lg bg-red-50 font-medium text-red-800" value="Travamento de crédito bancário">
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-orange-500 hover:transform hover:translate-x-1 transition-transform">
+                        <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2"><span class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">MÓDULO 3</span> Gestão de Crescimento</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">O que é?</label>
+                                <input type="text" id="ent_3_oque" class="w-full p-3 border rounded-lg bg-slate-50 font-medium text-slate-700" value="Separação de Contas e Fluxo">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-green-500 uppercase">Benefício</label>
+                                <input type="text" id="ent_3_beneficio" class="w-full p-3 border rounded-lg bg-green-50 font-medium text-green-800" value="Ver a cor do dinheiro">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-red-500 uppercase">Dor Resolvida</label>
+                                <input type="text" id="ent_3_dor" class="w-full p-3 border rounded-lg bg-red-50 font-medium text-red-800" value="Trabalhar muito sem ver lucro">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="objecoes" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-red-100 text-red-600 p-2 rounded-lg"><i class="fa-solid fa-fire"></i></span>
+                    Matadora de Objeções
+                </h2>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-red-100">
+                    <h3 class="font-black text-2xl text-red-600 mb-4 uppercase tracking-tighter flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> A Objeção Mestra</h3>
+                    <input type="text" id="obj_main_name" class="w-full p-4 border-2 border-red-200 rounded-xl mb-6 font-bold bg-red-50 text-xl text-red-900" value="Não tenho dinheiro para pagar um contador/curso agora.">
+                    
+                    <div class="grid md:grid-cols-2 gap-6 relative">
+                        <div class="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full border shadow-sm text-slate-400"><i class="fa-solid fa-arrow-right"></i></div>
+
+                        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                            <label class="text-xs font-black text-blue-500 uppercase mb-3 block flex items-center gap-2"><i class="fa-regular fa-heart"></i> 1. Empatia (Conexão)</label>
+                            <textarea id="obj_main_empatia" rows="5" class="w-full p-3 border-none bg-white rounded-xl text-slate-700 shadow-sm leading-relaxed text-lg resize-none">Eu entendo perfeitamente. Quando comecei, também achava que contabilidade era custo, não investimento. É difícil tirar dinheiro do caixa quando as vendas estão apertadas.</textarea>
+                        </div>
+                        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                            <label class="text-xs font-black text-indigo-500 uppercase mb-3 block flex items-center gap-2"><i class="fa-solid fa-brain"></i> 2. Lógica (Virada)</label>
+                            <textarea id="obj_main_logica" rows="5" class="w-full p-3 border-none bg-white rounded-xl text-slate-700 shadow-sm leading-relaxed text-lg resize-none">Mas pense comigo: quanto custa a multa de um CNPJ inapto? Quanto custa perder sua aposentadoria? O valor para regularizar hoje é uma fração do prejuízo de ser pego pela Receita amanhã.</textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-green-50 p-6 rounded-2xl border border-green-100">
+                        <label class="text-xs font-black text-green-600 uppercase mb-3 block flex items-center gap-2"><i class="fa-solid fa-check-double"></i> 3. Evidência (Nocaute)</label>
+                        <textarea id="obj_main_prova" rows="3" class="w-full p-3 border-none bg-white rounded-xl text-slate-700 shadow-sm text-lg">Exemplo: "O cliente João ia pagar R$ 5.000 em multas. Com nossa estratégia, reduziu para R$ 500 e parcelou. O lucro dele pagou a consultoria na primeira semana."</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="paginas" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg"><i class="fa-solid fa-laptop-code"></i></span>
+                    Estrutura de Páginas
+                </h2>
+                
+                <div class="space-y-8">
+                    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-100 px-6 py-3 border-b flex justify-between items-center">
+                            <span class="font-bold text-slate-600 text-sm"><i class="fa-solid fa-magnet text-blue-500"></i> PÁGINA DE CAPTURA</span>
+                            <div class="flex gap-1"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+                        </div>
+                        <div class="p-8">
+                            <div class="mb-6">
+                                <label class="text-xs font-bold text-slate-400 uppercase mb-1">Headline (A Promessa)</label>
+                                <input type="text" id="pg_cap_headline" class="w-full p-4 border-2 border-slate-200 rounded-lg font-black text-2xl text-slate-800 text-center" value="Você está deixando dinheiro na mesa com seu MEI?">
+                            </div>
+                            <div class="mb-6">
+                                <label class="text-xs font-bold text-slate-400 uppercase mb-1">Subheadline</label>
+                                <input type="text" id="pg_cap_sub" class="w-full p-3 border rounded-lg text-lg text-slate-600 text-center" value="80% dos empreendedores erram na declaração. Descubra sua situação em 2 minutos.">
+                            </div>
+                            <div class="flex justify-center">
+                                <input type="text" id="pg_cap_cta" class="w-2/3 p-4 rounded-full bg-yellow-400 text-yellow-900 font-bold text-center shadow-lg border-b-4 border-yellow-500 uppercase tracking-wide cursor-pointer hover:bg-yellow-300 transition-colors" value="FAZER DIAGNÓSTICO GRATUITO">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-100 px-6 py-3 border-b flex justify-between items-center">
+                            <span class="font-bold text-slate-600 text-sm"><i class="fa-solid fa-thumbs-up text-green-500"></i> PÁGINA DE OBRIGADO</span>
+                             <div class="flex gap-1"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+                        </div>
+                        <div class="p-8 bg-green-50">
+                            <div>
+                                <label class="text-xs font-bold text-green-700 uppercase mb-2 block text-center">Mensagem de Aviso</label>
+                                <textarea id="pg_obrig_aviso" class="w-full p-6 border-none rounded-xl bg-white shadow-sm text-center text-xl text-slate-700 leading-relaxed" rows="3">Seu diagnóstico está sendo gerado! Enquanto isso, entre no Grupo VIP do WhatsApp para receber o resultado e uma orientação exclusiva minha.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scripts" class="tab-content max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-pink-100 text-pink-600 p-2 rounded-lg"><i class="fa-solid fa-microphone"></i></span>
+                    Roteiros & Scripts
+                </h2>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-md border-l-8 border-pink-500">
+                    <h3 class="font-bold text-xl text-slate-800 mb-2">Convite (Baseado no Manual 3.0)</h3>
+                    <p class="text-xs text-pink-600 font-bold mb-4 uppercase tracking-wide">Estrutura: Identidade > Problema > Solução > CTA</p>
+                    <textarea id="script_convite" rows="12" class="w-full p-6 border rounded-xl bg-slate-50 font-mono text-base leading-relaxed text-slate-700 shadow-inner">"Olhe para esses rostos. Eles representam milhões de brasileiros donos do próprio destino.
+Cada MEI carrega sua própria mochila... Mas, no final do dia, todos falamos a mesma língua: a da persistência.
+
+Eu sou Jairo Gandra, da Percy Contabilidade.
+
+Muitos MEIs estão lutando uma guerra sozinhos e perdendo dinheiro para a burocracia.
+Não precisa ser assim.
+
+Nos dias [DATA], vou realizar o evento 'Cheguei, Sou MEI', onde vou te ensinar a transformar essa guerra em crescimento.
+
+Clique em Saiba Mais e venha para o lado de quem vence."</textarea>
+                </div>
+            </div>
+
+             <div id="cronograma" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800 flex items-center gap-3">
+                    <span class="bg-teal-100 text-teal-600 p-2 rounded-lg"><i class="fa-regular fa-calendar-check"></i></span>
+                    Cronograma de Lançamento (JANEIRO 2026)
+                </h2>
+                
+                <div class="grid md:grid-cols-4 gap-6 relative">
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-slate-200 -z-10 transform -translate-y-1/2"></div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-slate-500 text-center transform hover:-translate-y-2 transition-transform cursor-pointer">
+                        <div class="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-500 font-bold">1</div>
+                        <label class="block text-xs font-bold mb-2 uppercase text-slate-500">Início Captação (PPL)</label>
+                        <input type="date" id="date_ppl" class="w-full border p-2 rounded filled-bg font-bold text-lg text-center" value="2026-01-12">
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500 text-center transform hover:-translate-y-2 transition-transform cursor-pointer">
+                        <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-500 font-bold">2</div>
+                        <label class="block text-xs font-bold mb-2 uppercase text-blue-500">Evento (CPL 1)</label>
+                        <input type="date" id="date_cpl1" class="w-full border p-2 rounded filled-bg font-bold text-lg text-center" value="2026-01-26">
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500 text-center transform hover:-translate-y-2 transition-transform cursor-pointer">
+                        <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 font-bold">3</div>
+                        <label class="block text-xs font-bold mb-2 uppercase text-green-600">Abertura Carrinho</label>
+                        <input type="date" id="date_open" class="w-full border p-2 rounded bg-green-50 font-bold text-lg text-center text-green-800" value="2026-01-29">
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 text-center transform hover:-translate-y-2 transition-transform cursor-pointer">
+                        <div class="bg-red-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500 font-bold">4</div>
+                        <label class="block text-xs font-bold mb-2 uppercase text-red-500">Fechamento</label>
+                        <input type="date" id="date_close" class="w-full border p-2 rounded bg-red-50 font-bold text-lg text-center text-red-800" value="2026-02-02">
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Função de Festa com Confetes
+        function dispararConfete() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInOut(min, max) {
+            return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+            var timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            var particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // Navegação de Abas
+        function openTab(tabName) {
+            const contents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            const buttons = document.getElementsByClassName('nav-btn');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('bg-yellow-50');
+                buttons[i].classList.remove('border-yellow-500');
+                buttons[i].classList.remove('active-nav');
+                buttons[i].classList.remove('border-l-4');
+                buttons[i].classList.remove('font-bold');
+            }
+            document.getElementById(tabName).classList.add('active');
+            
+            const activeBtn = document.querySelector(`button[data-target="${tabName}"]`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-yellow-50');
+                activeBtn.classList.add('border-l-4');
+                activeBtn.classList.add('border-yellow-500');
+                activeBtn.classList.add('font-bold');
+            }
+        }
+
+        // Lógica de Salvar/Carregar
+        const inputs = document.querySelectorAll('input, textarea');
+        // Nova chave de armazenamento para garantir limpeza
+        const STORAGE_KEY_PREFIX = 'imersao_6em7_'; 
+
+        function saveData() {
+            inputs.forEach(input => {
+                localStorage.setItem(STORAGE_KEY_PREFIX + input.id, input.value);
+            });
+            dispararConfete(); // Festa ao salvar!
+            
+            const btn = document.querySelector('button[onclick="saveData()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
+            btn.classList.add('bg-green-700');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('bg-green-700');
+            }, 2000);
+        }
+
+        function loadData() {
+            inputs.forEach(input => {
+                const saved = localStorage.getItem(STORAGE_KEY_PREFIX + input.id);
+                if (saved) input.value = saved;
+            });
+        }
+
+        function exportData() {
+            let content = "PLANEJAMENTO IMERSÃO 6EM7 - PERCY CONTABILIDADE (2026)\n";
+            content += "========================================================\n\n";
+            inputs.forEach(input => {
+                let label = input.previousElementSibling?.innerText || input.id;
+                // Clean up label text (remove icons)
+                label = label.replace(/[^\w\sÀ-ÿ]/g, "").trim();
+                content += `[${label.toUpperCase()}]:\n${input.value}\n-----------------------------------\n`;
+            });
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Plano_6em7_Percy_Contabilidade.txt';
+            a.click();
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                localStorage.setItem(STORAGE_KEY_PREFIX + input.id, input.value);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            openTab('identidade');
+        });
+    </script>
+</body>
+</html>
